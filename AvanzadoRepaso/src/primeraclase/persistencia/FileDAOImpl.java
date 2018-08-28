@@ -11,21 +11,25 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import primeraclase.modelo.Employee;
 
 public class FileDAOImpl implements EmployeeDAO {
 
 	File empleados = new File("empleados.txt");
 	
-	@Override
-	public void guardar(Employee employee) {
-		try(Writer output = new BufferedWriter(new FileWriter(empleados.getName(), true));){
-			output.write(employee.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
+//	@Override //Escribimosen un archivo
+//	public void guardar(Employee employee) {
+//		try(Writer output = new BufferedWriter(new FileWriter(empleados.getName(), true));){
+//			output.write(employee.toString()+"\n");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	@Override
 	public List<Employee> recuperar() {
@@ -44,5 +48,33 @@ public class FileDAOImpl implements EmployeeDAO {
 		}
 		return empleadosString;
 	}
+
+	@Override//a Jackson
+	public void guardar(Employee employee) {
+		ObjectMapper mapper = new ObjectMapper();
+		//Convert object to JSON string and save into file directly 
+		try {
+			mapper.writeValue(new File("empleados.json"), employee);
+			//Convert object to JSON string
+			String jsonInString = mapper.writeValueAsString(employee);
+			System.out.println(jsonInString);
+			
+			//Convert object to JSON string and pretty print
+			jsonInString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(employee);
+			System.out.println(jsonInString);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	
 
 }
